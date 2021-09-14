@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/yousefmamdo/books-backend/issues"
   },
-  "homepage": "https://github.com/yousefmamdo/books-backend#readme"
+  "homepage": "https://github.com/yousefmamdo/books-backend#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
 }

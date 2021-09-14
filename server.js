@@ -16,8 +16,8 @@ let BookModel;
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect('mongodb://localhost:27017/books');
- // await mongoose.connect(process.env.MONGO_URL);
+  //await mongoose.connect(process.env.MONGO_URL);
+  await mongoose.connect('mongodb://localhost:27017/bookdb');
   const bookSchema = new mongoose.Schema({
     title: String,
     description: String,
@@ -27,7 +27,7 @@ async function main() {
 
   BookModel = mongoose.model('Books', bookSchema);
 
-// seedData();
+ // seedData();
 }
 
 async function seedData()
@@ -62,10 +62,11 @@ async function seedData()
   await book3.save()
 
 }
-server.get('/', homeHandler);
-server.get('/getBook',getBookHandler);
+ server.get('/', homeHandler);
+ server.get('/getBook',getBookHandler);
 server.post('/addBook',addBookHandler);
 server.delete('/deleteBook/:id',deleteBookHandler);
+server.put('/updateBook/:id',updateBookHandler);
 function homeHandler(req,res){
 
   res.send('Home Page');
@@ -87,9 +88,11 @@ function getBookHandler(req,res)
 }
 
 async function addBookHandler(req,res){
-  console.log(req.body);
- 
-  const {title, description, status, email} = req.body;
+  const title = req.body.title;
+  const description = req.body.description;
+  const status = req.body.status;
+  const email = req.body.email;
+
   await BookModel.create({ 
     title: title,
     description: description,
@@ -110,11 +113,11 @@ async function addBookHandler(req,res){
 }
 
 function deleteBookHandler(req,res){
-  const bookId = req.params.id;
-  const ownerEmail = req.query.email;
-  KittenModel.deleteOne({_id:catId},(err,result)=>{
-      
-      BookModel.find({email:ownerEmail},(err,result)=>{
+  const bookId = req.params.id
+  const email = req.query.email
+  BookModel.deleteOne({ _id: bookId }, (error, result) => 
+  {
+      BookModel.find({email:email},(err,result)=>{
           if(err)
           {
               console.log(err);
@@ -129,4 +132,24 @@ function deleteBookHandler(req,res){
 
 
 }
+function updateBookHandler(req,res) {
+  const bookId = req.params.id
+  const {title,description,status,email} = req.body
+  BookModel.findByIdAndUpdate(bookId,{title,description,status}, (error, result) => 
+  {
+      BookModel.find({email:email
+      
+      },(err,result)=>{
+          if(err)
+          {
+              console.log(err);
+          }
+          else
+          {
+              res.send(result);
+          }
+      })
+  })
+}
+
 server.listen(PORT, () => console.log(`listening on ${PORT}`));
